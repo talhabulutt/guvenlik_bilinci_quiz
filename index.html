@@ -48,11 +48,6 @@
             margin-bottom: 10px;
         }
 
-        .intro-desc {
-            color: #666;
-            margin-bottom: 30px;
-        }
-
         .mode-btn {
             display: block;
             width: 100%;
@@ -83,7 +78,7 @@
             background-color: #004494;
         }
 
-        /* Quiz Container (Başlangıçta gizli) */
+        /* Quiz Container */
         .quiz-container {
             display: none;
             background-color: var(--card-color);
@@ -103,16 +98,38 @@
             padding-bottom: 15px;
         }
 
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
         .question-counter {
             font-weight: bold;
             font-size: 1.1em;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-terminate {
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .btn-terminate:hover { background-color: #a71d2a; }
+
         .auto-advance-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9em;
+            gap: 5px;
+            font-size: 0.8em;
             color: #666;
         }
 
@@ -120,8 +137,8 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 40px;
-            height: 22px;
+            width: 34px;
+            height: 20px;
         }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -135,8 +152,8 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
+            height: 14px;
+            width: 14px;
             left: 3px;
             bottom: 3px;
             background-color: white;
@@ -144,7 +161,7 @@
             border-radius: 50%;
         }
         input:checked + .slider { background-color: var(--primary-color); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        input:checked + .slider:before { transform: translateX(14px); }
 
         /* Question Area */
         .question-badge {
@@ -216,16 +233,10 @@
             transition: background 0.2s;
         }
 
-        .btn-prev {
-            background-color: #e0e0e0;
-            color: #555;
-        }
+        .btn-prev { background-color: #e0e0e0; color: #555; }
         .btn-prev:hover { background-color: #d0d0d0; }
 
-        .btn-next {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        .btn-next { background-color: var(--primary-color); color: white; }
         .btn-next:hover { background-color: #004494; }
 
         .btn-warning {
@@ -234,9 +245,7 @@
             margin-top: 15px;
             width: 100%;
         }
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
+        .btn-warning:hover { background-color: #e0a800; }
 
         .btn-home {
             background-color: #6c757d;
@@ -249,12 +258,6 @@
             margin-top: 40px;
             border-top: 1px solid #eee;
             padding-top: 20px;
-        }
-        .quick-access-title {
-            text-align: center;
-            font-size: 0.9em;
-            color: #777;
-            margin-bottom: 10px;
         }
         .pagination-grid {
             display: grid;
@@ -274,10 +277,7 @@
             cursor: pointer;
             color: #555;
         }
-        .page-dot.active {
-            border: 2px solid var(--primary-color);
-            font-weight: bold;
-        }
+        .page-dot.active { border: 2px solid var(--primary-color); font-weight: bold; }
         .page-dot.correct-mark { background-color: var(--success-color); color: white; }
         .page-dot.wrong-mark { background-color: var(--error-color); color: white; }
 
@@ -320,17 +320,23 @@
     <div id="quiz-container" class="quiz-container">
         <div id="quiz-content">
             <div class="quiz-header">
-                <div class="question-counter">Soru: <span id="current-q-num">1</span>/<span id="total-q-num">50</span></div>
-                <div class="auto-advance-wrapper">
-                    <span>Doğruysa Otomatik Geç</span>
-                    <label class="switch">
-                        <input type="checkbox" id="auto-advance" checked>
-                        <span class="slider"></span>
-                    </label>
+                <div class="header-left">
+                    <div class="question-counter">Soru: <span id="current-q-num">1</span>/<span id="total-q-num">50</span></div>
+                    <span class="question-badge" id="pool-badge" style="margin-top:5px; margin-bottom:0;">Genel</span>
+                </div>
+                
+                <div class="header-right">
+                    <div class="auto-advance-wrapper">
+                        <span>Oto. Geç</span>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-advance" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <button class="btn-terminate" onclick="finishQuiz()">Testi Bitir</button>
                 </div>
             </div>
 
-            <span class="question-badge" id="pool-badge">Genel</span>
             <div class="question-text" id="question-text">
                 Sorular yükleniyor...
             </div>
@@ -344,7 +350,7 @@
             </div>
 
             <div class="quick-access">
-                <div class="quick-access-title">Hızlı Erişim</div>
+                <div class="quick-access-title" style="text-align:center; font-size:0.9em; color:#777; margin-bottom:10px;">Hızlı Erişim</div>
                 <div class="pagination-grid" id="pagination-grid">
                     </div>
             </div>
@@ -369,8 +375,7 @@
 
 <script>
     // --- VERİ TABANI ---
-
-    // 1. HAVUZ: BÖLÜM SONU SORULARI (Kitapçıkta yer alan sorular)
+    // 1. HAVUZ: BÖLÜM SONU SORULARI
     const chapterQuestions = [
         { q: "Aşağıdakilerden hangisi havacılığın teröristlerce cazip bulunmasının sebeplerinden biri değildir?", options: ["Kamuoyu ilgisinin çok olması", "Hızlı ve etkili propaganda imkanı sağlaması", "Elit tabakalar tarafından tercih edilmesi", "Can ve mal kaybının kayda değer olması", "Müdahale imkanının çok kısıtlı olması"], a: 2 },
         { q: "Risk ile ilgili aşağıdakilerden hangisi doğrudur? (Risk: Tehdit x Zafiyet)", options: ["Teröristlerin saldırı ihtimalini gösterir (Tehdit)", "Hedefin zayıflıklarıdır (Zafiyet)", "Bir saldırının düzenlenmesinin ve başarılı olmasının ihtimalidir", "Önleyici tedbirler ile sıfırlanabilir", "Teröristlerin saldırı gücüdür"], a: 2 },
@@ -429,7 +434,7 @@
         { q: "Yöneticilerin sorumluluklarından olmayan hangisidir?", options: ["Geri bildirimi teşvik etmek", "Kurallara uymak ve örnek olmak", "Önlemleri teşvik etmek", "Ekonomik sıkıntıda güvenliği göz ardı etmek", "Güvenliği değer haline getirmek"], a: 3 }
     ];
 
-    // 2. HAVUZ: AI (YAPAY ZEKA) SORU HAVUZU (PDF'ten türetilen yeni sorular)
+    // 2. HAVUZ: AI SORU HAVUZU
     const aiQuestions = [
         { q: "Havacılık tarihindeki 'ilk uçak kaçırma' olayı hangi yılda ve nerede gerçekleşmiştir?", options: ["1930 Peru (Byron Rickards)", "1947 Romanya", "1948 Hong Kong", "1968 Atina", "1970 Filistin"], a: 0, badge: "Tarihçe" },
         { q: "21 Aralık 1988'de Pan Am uçağının radyo içine gizlenmiş bombayla düşürüldüğü 'Lockerbie Faciası' hangi ülke tarafından desteklenmiştir?", options: ["İran", "Libya", "Suriye", "Kuzey Kore", "Irak"], a: 1, badge: "Olaylar" },
@@ -677,15 +682,22 @@
         let correctCount = 0;
         wrongAnswersPool = []; // Yanlış havuzunu sıfırla
 
-        userAnswers.forEach((ans, i) => {
-            if (ans === currentPool[i].a) {
-                correctCount++;
-            } else {
-                // Yanlış cevaplanan soruyu havuza ekle
-                // Object.assign veya spread operator ile kopyalıyoruz
-                wrongAnswersPool.push({...currentPool[i]});
+        // userAnswers dizisi currentPool ile aynı uzunlukta (başlangıçta null dolu)
+        for (let i = 0; i < currentPool.length; i++) {
+            const ans = userAnswers[i];
+            
+            // Sadece cevaplanmış sorulara bakıyoruz
+            if (ans !== null) {
+                if (ans === currentPool[i].a) {
+                    correctCount++;
+                } else {
+                    // Cevaplanmış ama yanlış ise havuza ekle
+                    // Nesne kopyalaması yaparak ekliyoruz
+                    wrongAnswersPool.push({...currentPool[i]});
+                }
             }
-        });
+            // Boş bırakılanları "yanlış havuzuna" atmıyoruz.
+        }
 
         const percentage = Math.round((correctCount / currentPool.length) * 100);
         
