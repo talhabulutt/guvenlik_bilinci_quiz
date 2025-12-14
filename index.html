@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genişletilmiş Güvenlik Bilinci Sınavı</title>
+    <title>Havacılık Güvenliği Eğitim Modülü</title>
     <style>
         :root {
             --primary-color: #0056b3;
@@ -26,14 +26,68 @@
             color: var(--text-color);
         }
 
-        .quiz-container {
-            background-color: var(--card-color);
+        .container {
             width: 100%;
             max-width: 800px;
+            margin: 20px;
+        }
+
+        /* Giriş Ekranı Kartı */
+        .intro-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .intro-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .intro-desc {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            background-color: white;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-color);
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary-color);
+            background-color: #f8faff;
+            color: var(--primary-color);
+        }
+
+        .mode-btn.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        .mode-btn.primary:hover {
+            background-color: #004494;
+        }
+
+        /* Quiz Container (Başlangıçta gizli) */
+        .quiz-container {
+            display: none;
+            background-color: var(--card-color);
             border-radius: var(--border-radius);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            margin: 20px;
             position: relative;
         }
 
@@ -91,6 +145,17 @@
         input:checked + .slider:before { transform: translateX(18px); }
 
         /* Question Area */
+        .question-badge {
+            display: inline-block;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
         .question-text {
             font-size: 1.25em;
             margin-bottom: 25px;
@@ -118,11 +183,6 @@
         .option-item:hover {
             border-color: var(--primary-color);
             background-color: #f8faff;
-        }
-
-        .option-item.selected {
-            border-color: var(--primary-color);
-            background-color: #e6f0ff;
         }
 
         .option-item.correct {
@@ -166,6 +226,12 @@
         }
         .btn-next:hover { background-color: #004494; }
 
+        .btn-home {
+            background-color: #6c757d;
+            color: white;
+            margin-top: 20px;
+        }
+
         /* Quick Access Grid */
         .quick-access {
             margin-top: 40px;
@@ -200,10 +266,6 @@
             border: 2px solid var(--primary-color);
             font-weight: bold;
         }
-        .page-dot.completed {
-            background-color: #e2e6ea;
-            color: var(--primary-color);
-        }
         .page-dot.correct-mark { background-color: var(--success-color); color: white; }
         .page-dot.wrong-mark { background-color: var(--error-color); color: white; }
 
@@ -233,364 +295,178 @@
 </head>
 <body>
 
-<div class="quiz-container">
-    <div id="quiz-screen">
-        <div class="quiz-header">
-            <div class="question-counter">Soru: <span id="current-q-num">1</span>/<span id="total-q-num">55</span></div>
-            <div class="auto-advance-wrapper">
-                <span>Doğruysa Otomatik Geç</span>
-                <label class="switch">
-                    <input type="checkbox" id="auto-advance" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="question-text" id="question-text">
-            Sorular yükleniyor...
-        </div>
-
-        <ul class="options-list" id="options-container">
-            </ul>
-
-        <div class="navigation-buttons">
-            <button class="btn btn-prev" id="btn-prev" onclick="prevQuestion()">← Önceki</button>
-            <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">Sonraki Soru →</button>
-        </div>
-
-        <div class="quick-access">
-            <div class="quick-access-title">Hızlı Erişim</div>
-            <div class="pagination-grid" id="pagination-grid">
-                </div>
-        </div>
+<div class="container">
+    <div id="intro-screen" class="intro-card">
+        <h1 class="intro-title">Havacılık Güvenliği Bilinci</h1>
+        <p class="intro-desc">Lütfen çözmek istediğiniz soru havuzunu seçiniz.</p>
+        
+        <button class="mode-btn" onclick="startQuiz('chapter')">Bölüm Sonu Soruları (55 Soru)</button>
+        <button class="mode-btn" onclick="startQuiz('ai')">AI (Yapay Zeka) Soru Havuzu (40 Soru)</button>
+        <button class="mode-btn primary" onclick="startQuiz('mixed')">Hepsini Karıştır (Tümü)</button>
     </div>
 
-    <div id="result-screen" class="result-screen">
-        <div class="score-circle">
-            <span id="final-score">%0</span>
-            <div class="score-label">BAŞARI</div>
+    <div id="quiz-container" class="quiz-container">
+        <div id="quiz-content">
+            <div class="quiz-header">
+                <div class="question-counter">Soru: <span id="current-q-num">1</span>/<span id="total-q-num">50</span></div>
+                <div class="auto-advance-wrapper">
+                    <span>Doğruysa Otomatik Geç</span>
+                    <label class="switch">
+                        <input type="checkbox" id="auto-advance" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <span class="question-badge" id="pool-badge">Genel</span>
+            <div class="question-text" id="question-text">
+                Sorular yükleniyor...
+            </div>
+
+            <ul class="options-list" id="options-container">
+                </ul>
+
+            <div class="navigation-buttons">
+                <button class="btn btn-prev" id="btn-prev" onclick="prevQuestion()">← Önceki</button>
+                <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">Sonraki Soru →</button>
+            </div>
+
+            <div class="quick-access">
+                <div class="quick-access-title">Hızlı Erişim</div>
+                <div class="pagination-grid" id="pagination-grid">
+                    </div>
+            </div>
+            
+            <button class="btn btn-home" style="width:100%; margin-top:30px;" onclick="location.reload()">⟲ Ana Menüye Dön</button>
         </div>
-        <div class="result-msg" id="result-message">Çalışmaya ihtiyacın var.</div>
-        <p id="stats-text"></p>
-        <button class="btn btn-next" onclick="restartQuiz()">Tüm Testi Yeniden Başlat (Karışık)</button>
+
+        <div id="result-screen" class="result-screen">
+            <div class="score-circle">
+                <span id="final-score">%0</span>
+                <div class="score-label">BAŞARI</div>
+            </div>
+            <div class="result-msg" id="result-message">Çalışmaya ihtiyacın var.</div>
+            <p id="stats-text"></p>
+            <button class="btn btn-next" onclick="location.reload()">Ana Menü / Yeni Test</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Tüm Soruların Veritabanı (Önceki Sorular + Yeni Eklenenler)
-    const questionsData = [
-        // --- ÖNCEKİ SORULAR ---
-        {
-            q: "Aşağıdakilerden hangisi havacılığın teröristlerce cazip bulunmasının sebeplerinden biri değildir?",
-            options: ["Kamuoyu ilgisinin çok olması", "Hızlı ve etkili propaganda imkanı sağlaması", "Elit tabakalar tarafından tercih edilmesi", "Can ve mal kaybının kayda değer olması", "Müdahale imkanının çok kısıtlı olması"],
-            a: 2 // C
-        },
-        {
-            q: "Risk ile ilgili aşağıdakilerden hangisi doğrudur? (Risk: Tehdit x Zafiyet)",
-            options: ["Teröristlerin saldırı ihtimalini gösterir (Tehdit)", "Hedefin zayıflıklarıdır (Zafiyet)", "Bir saldırının düzenlenmesinin ve başarılı olmasının ihtimalidir", "Önleyici tedbirler ile sıfırlanabilir", "Teröristlerin saldırı gücüdür"],
-            a: 2 // C
-        },
-        {
-            q: "Zafiyetin tanımı aşağıdakilerin hangisinde doğru olarak verilmiştir?",
-            options: ["Saldırı olasılığı ölçütüdür", "Saldırıya kalkışılma ihtimalidir", "Hedefin kötü amaçlarla kullanılabilecek özellikleridir", "Güvenliği sağlayan faaliyetlerdir", "Yasadışı müdahalenin olmamasıdır"],
-            a: 2 // C
-        },
-        {
-            q: "Aşağıdakilerden hangisi ya da hangileri yasadışı eylemlere örnek olarak gösterilebilir?<br>I. Rehine alma<br>II. Emniyeti tehlikeye atma<br>III. Siber saldırılar",
-            options: ["Yalnız I", "Yalnız II", "I ve III", "I, II, III", "II ve III"],
-            a: 3 // D
-        },
-        {
-            q: "Aşağıdakilerden hangisi potansiyel tehlike arz eden yolcudur?<br>I. Deporte yolcular<br>II. INAD yolcular<br>III. Hukuki işleme maruz kişiler",
-            options: ["Yalnız I", "Yalnız II", "I ve II", "I, II, III", "I ve III"],
-            a: 3 // D
-        },
-        {
-            q: "ICAO tarafından hazırlanan, sivil havacılık güvenliğiyle ilgili en iyi uygulamaları ve detaylı prosedürleri içeren Güvenlik El Kitabı hangisidir?",
-            options: ["Doc. 30", "Doc. 8973", "Ek-9", "Ek-17", "Ek-6"],
-            a: 1 // B
-        },
-        {
-            q: "Doc.8973 için aşağıdakilerden hangisi doğrudur?",
-            options: ["Uygulanması zorunludur", "Tüm düzenlemeleri içerir", "Detaylı tavsiyeler ve uygulama yöntemleri içerir", "Kısa ve öz yazılmıştır", "Tokyo Sözleşmesi ekidir"],
-            a: 2 // C
-        },
-        {
-            q: "ECAC'ın 'Havacılık Güvenliği Alanında Politika Beyanı' dokümanının kısa adı nedir?",
-            options: ["Doc 30 Kısım II", "Doc 8973", "Ek-9", "Ek-17", "Ek-6"],
-            a: 0 // A
-        },
-        {
-            q: "Ulusal Sivil Havacılık Güvenlik Programı (MSHGP) ile ilgili hangisi doğru DEĞİLDİR?",
-            options: ["Uygulanması zorunlu değildir", "Yazılı bir belge olmalıdır", "Güvenlik tedbirlerini içerir", "Tüm kurumları kapsar", "Yerli/Yabancı işletmeleri kapsar"],
-            a: 0 // A
-        },
-        {
-            q: "Havaalanı güvenlik programı için hangileri doğrudur?<br>I. Zorunludur<br>II. Havaalanına özgü olmalıdır<br>III. Ulusal programla uyumlu olmalıdır",
-            options: ["I, II ve III", "I ve II", "Yalnız II", "Yalnız III", "II ve III"],
-            a: 0 // A
-        },
-        {
-            q: "Uluslararası Sivil Havacılık Teşkilatı (ICAO) kaç üye ülkeden oluşmaktadır?",
-            options: ["185", "183", "193", "195", "190"],
-            a: 2 // C
-        },
-        {
-            q: "ICAO Konseyi'ne üye olan devletler kaç yıllığına seçilmektedir?",
-            options: ["1", "3", "5", "7", "10"],
-            a: 1 // B
-        },
-        {
-            q: "Aşağıdakilerden hangisi ECAC güvenlik organizasyonu birimleri arasında yer alır?",
-            options: ["Güvenlik Forumu ve Yönetim Grubu (Genel ECAC Yapısı)", "Sadece Komisyon", "Sadece İrtibat Bürosu", "Hiçbiri", "Hepsi"],
-            a: 0 // A
-        },
-        {
-            q: "Aşağıdakilerden hangisi Ulusal Güvenlik Denetçisinin görevi DEĞİLDİR?",
-            options: ["Uyumluluğu izlemek", "Eksiklikleri tespit etmek", "Düzeltme sağlamak", "Güvenlik Komisyonu üyeliği yapmak (Karar verici olmak)", "Test yapmak"],
-            a: 3 // D
-        },
-        {
-            q: "Ulusal yapılanmada bulunması gereken organlar arasında hangisi EK-17'de ana başlık olarak sayılmaz?",
-            options: ["Yetkili Otorite", "Ulusal Güvenlik Komisyonu", "Havaalanı Güvenlik Komisyonu", "Eğitim Araştırma Birimi", "Yerel Otorite"],
-            a: 3 // D
-        },
-        {
-            q: "Havaalanının hangi alanına geçişlerde giriş kontrolü uygulanmaz?",
-            options: ["Kara tarafı", "Hava tarafı", "Güvenlik tahditli alan", "Kritik bölüm", "Demarke alan"],
-            a: 0 // A
-        },
-        {
-            q: "Araç giriş izinleri ile ilgili hangisi doğrudur?<br>II. Geçerli izinle girilir<br>III. Eşleşme kontrol edilir<br>V. Belge görünür olmalıdır",
-            options: ["I, II, III", "II, III, V", "III, IV, V", "I, IV, V", "I, II, IV"],
-            a: 1 // B
-        },
-        {
-            q: "Yolcu dışındaki kişilerin taranmasının temel amacı nedir?",
-            options: ["Giriş kontrolü", "Çalıştığını kanıtlama", "Gereksiz girişi önleme", "Risk analizi", "Patlayıcı/Yasaklı madde tespiti"],
-            a: 4 // E
-        },
-        {
-            q: "Kişilerin taranması için kullanılan cihaz/yöntem hangisidir?",
-            options: ["Elle arama (Yöntem)", "Patlayıcı İz Tespit Cihazı (ETD)", "Görsel kontrol", "X-ray (Eşya için)", "Sıvı dedektörü"],
-            a: 1 // B
-        },
-        {
-            q: "Giriş kartlarıyla ilgili hangisi YANLIŞTIR?",
-            options: ["Üniforma giriş yetkisi vermez", "Sadece tanzim edildiği yerde geçerlidir", "Kurumun/Kuruluşun herhangi bir sorumluluğu bulunmamaktadır", "İşveren değişirse iade edilir", "Farklı şekillerde (Daimi/Geçici) düzenlenebilir"],
-            a: 2 // C
-        },
-        {
-            q: "Şüpheli paket tespitinde aşağıdakilerden hangisi YAPILMAMALIDIR?",
-            options: ["Emniyet hattı oluşturmak", "Tahliye etmek", "Panik yapmamak", "Bilgi toplamak", "Üzerini örtmek veya dokunmak"],
-            a: 4 // E
-        },
-        {
-            q: "Aşağıdakilerden hangisi ŞÜPHELİ bir durum DEĞİLDİR?",
-            options: ["Bagaj yükleme görevlisinin apronda bulunması", "Plakasız araç", "Sahipsiz bagaj", "Kartsız personel", "GTA'da sahipsiz çanta"],
-            a: 0 // A
-        },
-        {
-            q: "Havacılık güvenliğine yönelik şüpheli durumları bildirmek kimin görevidir?",
-            options: ["Herkesin (Özel güvenlik, Temizlik, Yer hizmetleri, Havayolu, Polis)", "Sadece Polis", "Sadece Güvenlik", "Yöneticilerin", "Pilotların"],
-            a: 0 // A
-        },
-        {
-            q: "Şüpheli durum raporlamaya ilişkin hangisi YANLIŞTIR?",
-            options: ["Mutlaka yazılı yapılmalıdır (Sözlü de olabilir)", "Otoriteye bildirilir", "Güvenlik birimine bildirilir", "Tüm personelin görevidir", "Acil durum içerir"],
-            a: 0 // A
-        },
-        {
-            q: "Olay raporlamada bulunması gereken özelliklerden hangisi YANLIŞTIR?",
-            options: ["Olayın sebebine ilişkin şahsi görüşler belirtilmelidir", "Kronolojik olmalıdır", "Net olmalıdır", "Yer belirtilmelidir", "Objektif olmalıdır"],
-            a: 0 // A
-        },
-        {
-            q: "Aşağıdakilerden hangisi güvenlik kültürünün unsurlarından değildir?",
-            options: ["Normlar", "İnançlar", "Değerler", "Tutumlar", "Şüpheler"],
-            a: 4 // E
-        },
-        {
-            q: "Yöneticilerin güvenlik kültürü kapsamında yapmaması gereken davranış hangisidir?",
-            options: ["Örnek olmak", "Teşvik etmek", "Eğitimi desteklemek", "Olayları takip etmek", "Ekonomik krizde güvenliği yük olarak görmek"],
-            a: 4 // E
-        },
-        {
-            q: "Hangisi ZAYIF güvenlik kültürü göstergesi DEĞİLDİR?",
-            options: ["Raporlama kanallarının güvenilir olması (Bu güçlü kültürdür)", "Düşük raporlama", "Personelin bilgisizliği", "Güvenliğin yük görülmesi", "Ders alınmaması"],
-            a: 0 // A
-        },
-        {
-            q: "Kurumların uygulayacağı güvenlik kültürü faaliyeti olmayan hangisidir?",
-            options: ["Yasama (Devlet görevi)", "Koordinasyon", "İç iletişim", "Kampanyalar", "Farkındalık eğitimi"],
-            a: 0 // A
-        },
-        {
-            q: "Etkili güvenlik kültürünün faydalarından olmayan hangisidir?",
-            options: ["Güvenlik riskinin artması (Risk azalır)", "Sorumluluk alma", "Bildirme olasılığının artması", "Harcamasız gelişim", "Uyumun artması"],
-            a: 0 // A
-        },
+    // --- VERİ TABANI ---
 
-        // --- YENİ EKLENEN SORULAR ---
-
-        // 1) Yasadışı Müdahale
-        {
-            q: "I) Hava aracının yasadışı olarak ele geçirilmesi<br>II) Hizmetteki hava aracına zarar verilmesi<br>III) Rehin alınma<br>IV) İzinsiz giriş<br>V) Silah/tehlikeli madde sokulması<br>Yukarıdakilerden hangisi/hangileri yasadışı müdahale eylemleri arasında yer alır?",
-            options: ["I, II, III ve IV", "I, III ve IV", "II, III ve IV", "I, II ve III", "I, II, III, IV ve V"],
-            a: 4 // E
-        },
-        // 2) İç Tehdit
-        {
-            q: "“……… havacılık sektöründe çalışan bir kişinin farklı motivasyonlarla bir terör örgütüne yardımcı olmasıdır.” Boş bırakılan alana hangisi gelmelidir?",
-            options: ["Potansiyel tehlike arz eden yolcu", "İç tehdit", "Sınır dışı edilen kişiler", "İHA", "Kural dışı yolcu"],
-            a: 1 // B
-        },
-        // 3) Tehdit Değildir
-        {
-            q: "Aşağıdakilerden hangisi havacılık güvenliğine yönelik tehditlerden değildir?",
-            options: ["Arıza", "Taşınabilir Hava Savunma Sistemi (MANPADS)", "El Yapımı Patlayıcılar", "Sabotaj", "Siber Saldırılar"],
-            a: 0 // A
-        },
-        // 4) Kural Dışı Yolcu
-        {
-            q: "Bir havaalanında ya da hava aracında kurallara uymayarak veya personelin talimatlarına uymayarak düzen ve disiplini bozan kişilere ne ad verilir?",
-            options: ["Kural dışı yolcu", "Kabul edilmez yolcu", "Sınır dışı edilen kişiler", "Akli dengesi bozuk yolcu", "Hukuki işleme maruz kişi"],
-            a: 0 // A
-        },
-        // 5) Bireysel Tehdit Özelliği
-        {
-            q: "Bireylerin hareket ettikleri için ne tür bir eylem gerçekleştireceklerinin ve bir sonraki hareketlerinin tahmin edilmesinin zor olması, bireysel tehditlerin hangi özelliği ile ilişkilidir?",
-            options: ["Kısıtlı kaynak", "Kısıtlı teknik uzmanlık", "Öngörülemezlik", "Kişisellik", "Şüpheli davranış"],
-            a: 2 // C
-        },
-        // 6) USHGP Doğrudur
-        {
-            q: "I) Oluşturulması ve uygulanması zorunludur<br>II) Yazılı bir belge olması gerekir<br>III) Önlemleri içerir<br>IV) Sorumlu bir yetkili otorite belirlenir<br>Yukarıdakilerden hangisi/hangileri Ulusal Sivil Havacılık Güvenlik Programı için doğrudur?",
-            options: ["II, III ve IV", "I, II ve III", "I, II, III ve IV", "Yalnız I", "II ve III"],
-            a: 2 // C
-        },
-        // 7) Ek-17 Özelliği
-        {
-            q: "ICAO Ek-17 Güvenlik düzenlemesi için aşağıdakilerden hangisi doğrudur?",
-            options: ["Çok detaylı ve kapsamlıdır", "Tüm sivil havacılık düzenlemelerini içerir", "Uygulama detaylarına dair ayrıntılı tavsiyeler içerir", "Oldukça kısa ve öz bir şekilde kaleme alınmıştır", "Tokyo Sözleşmesi’ne ek olarak düzenlenmiştir"],
-            a: 3 // D
-        },
-        // 8) Program Amacı
-        {
-            q: "Aşağıdakilerden hangisinin temel amacı; halkın, yolcuların, personelin ve tesislerin korunmasını sağlamak ve görev-yetki-sorumlulukları düzenlemektir?",
-            options: ["Ulusal Sivil Havacılık Güvenlik Programı", "Ulusal Sivil Havacılık Güvenlik Eğitim Programı", "Havayolu Emniyet Programı", "Havayolu Güvenlik Programı", "Ulusal Sivil Havacılık Emniyet Programı"],
-            a: 0 // A
-        },
-        // 9) MEX Sözleşmesi
-        {
-            q: "Hangi sözleşme, sivil havacılığa karşı patlayıcı düzeneklerinin kullanılmasını kapsamaktadır?",
-            options: ["Plastik Patlayıcıların İşaretlenmesine Dair Sözleşme (MEX)", "Tokyo Sözleşmesi", "Lahey Sözleşmesi", "Şikago Sözleşmesi", "Montreal Sözleşmesi"],
-            a: 0 // A
-        },
-        // 10) Tokyo Sözleşmesi
-        {
-            q: "Hangi sözleşme, uçaktaki düzeni veya disiplini bozan eylemlerde hava aracından sorumlu kişilere yetki vermektedir?",
-            options: ["Şikago Sözleşmesi", "Tokyo Sözleşmesi (Suçlar ve Diğer Bazı Eylemler)", "Lahey Sözleşmesi", "Montreal Sözleşmesi", "MEX Sözleşmesi"],
-            a: 1 // B
-        },
-        // 11) Komite Görevi Değildir
-        {
-            q: "Aşağıdakilerden hangisi Ulusal Sivil Havacılık Güvenlik Komitesi’nin görevlerinden değildir?",
-            options: ["Tavsiyelerde bulunmak", "Koordinasyonu sağlamak", "Tasarımda güvenliği teşvik etmek", "Uluslararası işbirliği yollarını düşünmek", "Havalimanlarında denetim, test ve inceleme yapmak"],
-            a: 4 // E
-        },
-        // 12) Ulusal Yapılanma (En Az)
-        {
-            q: "I) Yetkili Otorite<br>II) Havaalanı Güvenlik Komisyonu<br>III) Yerel Otorite<br>IV) Eğitim Birimi<br>Şikago Sözleşmesi Ek-17’ye göre ulusal yapılanma yukarıdakilerden en az hangisini/hangilerini içermelidir?",
-            options: ["I, II ve III", "I, II, III ve IV", "I ve IV", "Yalnız I", "II ve IV"],
-            a: 0 // A
-        },
-        // 13) Ulusal Yapılanma Yeri
-        {
-            q: "Havacılık güvenliği alanında ulusal yapılanmanın nasıl oluşturulması gerektiği aşağıdakilerden hangisinde düzenlenmiştir?",
-            options: ["Şikago Sözleşmesi Ek-17, Bölüm 3", "Şikago Sözleşmesi Ek-14, Bölüm 5", "Şikago Sözleşmesi Ek-15, Bölüm 7", "Şikago Sözleşmesi Ek-14, Bölüm 9", "Şikago Sözleşmesi Ek-15, Bölüm 8"],
-            a: 0 // A
-        },
-        // 14) Yetkili Otorite
-        {
-            q: "Ulusal Sivil Havacılık Güvenlik Programı’nın geliştirilmesi, uygulanması ve devamlılığından sorumlu olan kuruluş hangisidir?",
-            options: ["Ulusal Güvenlik Teşkilatı", "Yetkili Otorite", "Ulusal Havacılık Güvenliği Komitesi", "Ulusal Güvenlik Denetçisi", "Havaalanı Güvenlik Komisyonu"],
-            a: 1 // B
-        },
-        // 15) Havaalanı Komisyonu
-        {
-            q: "Ulusal havacılık güvenliği yapılanmasında yer alan havaalanı güvenlik komisyonu ile ilgili olarak aşağıdakilerden hangisi doğrudur?",
-            options: ["Her havaalanı için ayrı ayrı kurulur ve yerel düzeyde faaliyet gösterir", "Sadece uluslararası havaalanlarında kurulur", "Görevleri sadece yolcu güvenliği ile sınırlıdır", "Havaalanı güvenlik otoritesine doğrudan bağlı çalışır", "Teknik bakım ve uçuş planlamasından sorumludur"],
-            a: 0 // A
-        },
-        // 16) Araç Giriş İzni
-        {
-            q: "I) Araç giriş izni araca özel olmalıdır<br>II) İzin belgesinde alanlar yer almalıdır<br>III) Son kullanma tarihi yazılmalıdır<br>IV) Şoför bilgileri yer almalıdır<br>Araç giriş izni ile ilgili hangileri doğrudur?",
-            options: ["I, II, III ve IV", "I, II ve III", "II, III ve IV", "Yalnız II", "II ve III"],
-            a: 1 // B
-        },
-        // 17) GTA
-        {
-            q: "Geçerli bir giriş belgesiyle ve güvenlik kontrolü yapılarak giriş sağlanan alanlara ne ad verilir?",
-            options: ["Hava tarafı", "Kara tarafı", "Kontuar alanı", "Güvenlik tahditli alan", "Demarke alan"],
-            a: 3 // D
-        },
-        // 18) Kart Sahibi Kuralı
-        {
-            q: "Aşağıdakilerden hangisi giriş kartı sahibi personelin uyması gereken kurallardan değildir?",
-            options: ["Kartı sadece izin verilen alanlar için kullanmak", "Kartı başkasına vermemek", "Güvenlik kontrolüne izin vermek", "Görevli oldukları alanlara izinsiz misafir veya ziyaretçi kabul etmek", "Taramaya tabi olmak"],
-            a: 3 // D
-        },
-        // 19) Hava Tarafı
-        {
-            q: "Havaalanında herkesin giriş yapamadığı, sadece yolcunun ve yetkili personelin giriş yapabildiği, “giriş kontrolü” yapılan noktadan sonraki kısımlara ne ad verilir?",
-            options: ["Güvenlik tahditli alan", "Kara tarafı", "Hava tarafı", "Check-in salonu", "Demarke alan"],
-            a: 2 // C
-        },
-        // 20) Giriş Kontrol
-        {
-            q: "Hava tarafı ve güvenlik tahditli alanlara yetkisiz kişilerin ve araçların girişinin önlenmesi amacıyla yapılan yetki kontrolüne ne denir?",
-            options: ["Güvenlik kontrolü", "Giriş kontrol", "Tarama", "Giriş kısıtlaması", "Yetkisiz giriş"],
-            a: 1 // B
-        },
-        // 21) Fayda Değildir (Harcama)
-        {
-            q: "Aşağıdakilerden hangisi etkili güvenlik kültürünün faydaları arasında gösterilemez?",
-            options: ["Çalışanlar sorumluluk alır", "Uyum seviyeleri artar", "Bildirme olasılığı yükselir", "Daha büyük güvenlik duygusu sağlanır", "Güvenliğin, büyük harcamalar yapılarak sağlanması"],
-            a: 4 // E
-        },
-        // 22) Kampanyalar
-        {
-            q: "I) El ilanları/posterler<br>II) E-öğrenme<br>III) İntranet/video<br>IV) Dijital medya<br>Hangisi güvenlik kültürünü geliştirmek için yapılacak kampanyalardandır?",
-            options: ["Yalnız III", "I, II ve III", "I ve III", "III ve IV", "I, II, III ve IV"],
-            a: 4 // E
-        },
-        // 23) Zayıf Güvenlik Kültürü
-        {
-            q: "Havacılık çalışanlarının güvenlik ve tehditler hakkında bilgi sahibi olmaması ya da bilinçli olmaması durumu nedir?",
-            options: ["Temel sivil havacılık güvenliği", "Güvenli tedarik zinciri", "Güvenlik bilinci", "İlave güvenlik tedbiri", "Zayıf güvenlik kültürü"],
-            a: 4 // E
-        },
-        // 24) Fayda Değildir (Risk Artışı)
-        {
-            q: "Aşağıdakilerden hangisi etkili bir güvenlik kültürünün faydalarından değildir?",
-            options: ["Güvenlik olaylarının yaşanma riski, çalışanların bilinçlenmesiyle ARTAR", "Çalışanlar sorumluluk alır", "Şüpheli davranışları bildirme artar", "Büyük harcamasız geliştirilir", "Uyum seviyeleri artar"],
-            a: 0 // A
-        },
-        // 25) Sorumluluk Değildir
-        {
-            q: "Aşağıdakilerden hangisi yöneticilerin sorumluluklarından değildir?",
-            options: ["Geri bildirimi teşvik etmek", "Kurallara uymak ve örnek olmak", "Önlemleri teşvik etmek", "Ekonomik sıkıntı dönemlerinde havacılık güvenliğinden taviz vermek", "Güvenliği temel değer haline getirmek"],
-            a: 3 // D
-        }
+    // 1. HAVUZ: BÖLÜM SONU SORULARI (Kitapçıkta yer alan sorular)
+    const chapterQuestions = [
+        { q: "Aşağıdakilerden hangisi havacılığın teröristlerce cazip bulunmasının sebeplerinden biri değildir?", options: ["Kamuoyu ilgisinin çok olması", "Hızlı ve etkili propaganda imkanı sağlaması", "Elit tabakalar tarafından tercih edilmesi", "Can ve mal kaybının kayda değer olması", "Müdahale imkanının çok kısıtlı olması"], a: 2 },
+        { q: "Risk ile ilgili aşağıdakilerden hangisi doğrudur? (Risk: Tehdit x Zafiyet)", options: ["Teröristlerin saldırı ihtimalini gösterir (Tehdit)", "Hedefin zayıflıklarıdır (Zafiyet)", "Bir saldırının düzenlenmesinin ve başarılı olmasının ihtimalidir", "Önleyici tedbirler ile sıfırlanabilir", "Teröristlerin saldırı gücüdür"], a: 2 },
+        { q: "Zafiyetin tanımı aşağıdakilerin hangisinde doğru olarak verilmiştir?", options: ["Saldırı olasılığı ölçütüdür", "Saldırıya kalkışılma ihtimalidir", "Hedefin kötü amaçlarla kullanılabilecek özellikleridir", "Güvenliği sağlayan faaliyetlerdir", "Yasadışı müdahalenin olmamasıdır"], a: 2 },
+        { q: "Aşağıdakilerden hangisi ya da hangileri yasadışı eylemlere örnek olarak gösterilebilir?<br>I. Rehine alma<br>II. Emniyeti tehlikeye atma<br>III. Siber saldırılar", options: ["Yalnız I", "Yalnız II", "I ve III", "I, II, III", "II ve III"], a: 3 },
+        { q: "Aşağıdakilerden hangisi potansiyel tehlike arz eden yolcudur?<br>I. Deporte yolcular<br>II. INAD yolcular<br>III. Hukuki işleme maruz kişiler", options: ["Yalnız I", "Yalnız II", "I ve II", "I, II, III", "I ve III"], a: 3 },
+        { q: "ICAO tarafından hazırlanan, sivil havacılık güvenliğiyle ilgili en iyi uygulamaları ve detaylı prosedürleri içeren Güvenlik El Kitabı hangisidir?", options: ["Doc. 30", "Doc. 8973", "Ek-9", "Ek-17", "Ek-6"], a: 1 },
+        { q: "Doc.8973 için aşağıdakilerden hangisi doğrudur?", options: ["Uygulanması zorunludur", "Tüm düzenlemeleri içerir", "Detaylı tavsiyeler ve uygulama yöntemleri içerir", "Kısa ve öz yazılmıştır", "Tokyo Sözleşmesi ekidir"], a: 2 },
+        { q: "ECAC'ın 'Havacılık Güvenliği Alanında Politika Beyanı' dokümanının kısa adı nedir?", options: ["Doc 30 Kısım II", "Doc 8973", "Ek-9", "Ek-17", "Ek-6"], a: 0 },
+        { q: "Ulusal Sivil Havacılık Güvenlik Programı (MSHGP) ile ilgili hangisi doğru DEĞİLDİR?", options: ["Uygulanması zorunlu değildir", "Yazılı bir belge olmalıdır", "Güvenlik tedbirlerini içerir", "Tüm kurumları kapsar", "Yerli/Yabancı işletmeleri kapsar"], a: 0 },
+        { q: "Havaalanı güvenlik programı için hangileri doğrudur?<br>I. Zorunludur<br>II. Havaalanına özgü olmalıdır<br>III. Ulusal programla uyumlu olmalıdır", options: ["I, II ve III", "I ve II", "Yalnız II", "Yalnız III", "II ve III"], a: 0 },
+        { q: "Uluslararası Sivil Havacılık Teşkilatı (ICAO) kaç üye ülkeden oluşmaktadır?", options: ["185", "183", "193", "195", "190"], a: 2 },
+        { q: "ICAO Konseyi'ne üye olan devletler kaç yıllığına seçilmektedir?", options: ["1", "3", "5", "7", "10"], a: 1 },
+        { q: "Aşağıdakilerden hangisi ECAC güvenlik organizasyonu birimleri arasında yer alır?", options: ["Güvenlik Forumu ve Yönetim Grubu", "Sadece Komisyon", "Sadece İrtibat Bürosu", "Hiçbiri", "Hepsi"], a: 0 },
+        { q: "Aşağıdakilerden hangisi Ulusal Güvenlik Denetçisinin görevi DEĞİLDİR?", options: ["Uyumluluğu izlemek", "Eksiklikleri tespit etmek", "Düzeltme sağlamak", "Güvenlik Komisyonu üyeliği yapmak (Karar verici olmak)", "Test yapmak"], a: 3 },
+        { q: "Ulusal yapılanmada bulunması gereken organlar arasında hangisi EK-17'de ana başlık olarak sayılmaz?", options: ["Yetkili Otorite", "Ulusal Güvenlik Komisyonu", "Havaalanı Güvenlik Komisyonu", "Eğitim Araştırma Birimi", "Yerel Otorite"], a: 3 },
+        { q: "Havaalanının hangi alanına geçişlerde giriş kontrolü uygulanmaz?", options: ["Kara tarafı", "Hava tarafı", "Güvenlik tahditli alan", "Kritik bölüm", "Demarke alan"], a: 0 },
+        { q: "Araç giriş izinleri ile ilgili hangisi doğrudur?<br>II. Geçerli izinle girilir<br>III. Eşleşme kontrol edilir<br>V. Belge görünür olmalıdır", options: ["I, II, III", "II, III, V", "III, IV, V", "I, IV, V", "I, II, IV"], a: 1 },
+        { q: "Yolcu dışındaki kişilerin taranmasının temel amacı nedir?", options: ["Giriş kontrolü", "Çalıştığını kanıtlama", "Gereksiz girişi önleme", "Risk analizi", "Patlayıcı/Yasaklı madde tespiti"], a: 4 },
+        { q: "Kişilerin taranması için kullanılan cihaz/yöntem hangisidir?", options: ["Elle arama (Yöntem)", "Patlayıcı İz Tespit Cihazı (ETD)", "Görsel kontrol", "X-ray (Eşya için)", "Sıvı dedektörü"], a: 1 },
+        { q: "Giriş kartlarıyla ilgili hangisi YANLIŞTIR?", options: ["Üniforma giriş yetkisi vermez", "Sadece tanzim edildiği yerde geçerlidir", "Kurumun/Kuruluşun herhangi bir sorumluluğu bulunmamaktadır", "İşveren değişirse iade edilir", "Farklı şekillerde (Daimi/Geçici) düzenlenebilir"], a: 2 },
+        { q: "Şüpheli paket tespitinde aşağıdakilerden hangisi YAPILMAMALIDIR?", options: ["Emniyet hattı oluşturmak", "Tahliye etmek", "Panik yapmamak", "Bilgi toplamak", "Üzerini örtmek veya dokunmak"], a: 4 },
+        { q: "Aşağıdakilerden hangisi ŞÜPHELİ bir durum DEĞİLDİR?", options: ["Bagaj yükleme görevlisinin apronda bulunması", "Plakasız araç", "Sahipsiz bagaj", "Kartsız personel", "GTA'da sahipsiz çanta"], a: 0 },
+        { q: "Havacılık güvenliğine yönelik şüpheli durumları bildirmek kimin görevidir?", options: ["Herkesin (Özel güvenlik, Temizlik, Yer hizmetleri, Havayolu, Polis)", "Sadece Polis", "Sadece Güvenlik", "Yöneticilerin", "Pilotların"], a: 0 },
+        { q: "Şüpheli durum raporlamaya ilişkin hangisi YANLIŞTIR?", options: ["Mutlaka yazılı yapılmalıdır (Sözlü de olabilir)", "Otoriteye bildirilir", "Güvenlik birimine bildirilir", "Tüm personelin görevidir", "Acil durum içerir"], a: 0 },
+        { q: "Olay raporlamada bulunması gereken özelliklerden hangisi YANLIŞTIR?", options: ["Olayın sebebine ilişkin şahsi görüşler belirtilmelidir", "Kronolojik olmalıdır", "Net olmalıdır", "Yer belirtilmelidir", "Objektif olmalıdır"], a: 0 },
+        { q: "Aşağıdakilerden hangisi güvenlik kültürünün unsurlarından değildir?", options: ["Normlar", "İnançlar", "Değerler", "Tutumlar", "Şüpheler"], a: 4 },
+        { q: "Yöneticilerin güvenlik kültürü kapsamında yapmaması gereken davranış hangisidir?", options: ["Örnek olmak", "Teşvik etmek", "Eğitimi desteklemek", "Olayları takip etmek", "Ekonomik krizde güvenliği yük olarak görmek"], a: 4 },
+        { q: "Hangisi ZAYIF güvenlik kültürü göstergesi DEĞİLDİR?", options: ["Raporlama kanallarının güvenilir olması (Bu güçlü kültürdür)", "Düşük raporlama", "Personelin bilgisizliği", "Güvenliğin yük görülmesi", "Ders alınmaması"], a: 0 },
+        { q: "Kurumların uygulayacağı güvenlik kültürü faaliyeti olmayan hangisidir?", options: ["Yasama (Devlet görevi)", "Koordinasyon", "İç iletişim", "Kampanyalar", "Farkındalık eğitimi"], a: 0 },
+        { q: "Etkili güvenlik kültürünün faydalarından olmayan hangisidir?", options: ["Güvenlik riskinin artması (Risk azalır)", "Sorumluluk alma", "Bildirme olasılığının artması", "Harcamasız gelişim", "Uyumun artması"], a: 0 },
+        { q: "I) Hava aracının yasadışı olarak ele geçirilmesi<br>II) Hizmetteki hava aracına zarar verilmesi<br>III) Rehin alınma<br>IV) İzinsiz giriş<br>V) Silah/tehlikeli madde sokulması<br>Yukarıdakilerden hangisi/hangileri yasadışı müdahale eylemleri arasında yer alır?", options: ["I, II, III ve IV", "I, III ve IV", "II, III ve IV", "I, II ve III", "I, II, III, IV ve V"], a: 4 },
+        { q: "“……… havacılık sektöründe çalışan bir kişinin farklı motivasyonlarla bir terör örgütüne yardımcı olmasıdır.” Boş bırakılan alana hangisi gelmelidir?", options: ["Potansiyel tehlike arz eden yolcu", "İç tehdit", "Sınır dışı edilen kişiler", "İHA", "Kural dışı yolcu"], a: 1 },
+        { q: "Aşağıdakilerden hangisi havacılık güvenliğine yönelik tehditlerden değildir?", options: ["Arıza", "Taşınabilir Hava Savunma Sistemi (MANPADS)", "El Yapımı Patlayıcılar", "Sabotaj", "Siber Saldırılar"], a: 0 },
+        { q: "Bir havaalanında ya da hava aracında kurallara uymayarak veya personelin talimatlarına uymayarak düzen ve disiplini bozan kişilere ne ad verilir?", options: ["Kural dışı yolcu", "Kabul edilmez yolcu", "Sınır dışı edilen kişiler", "Akli dengesi bozuk yolcu", "Hukuki işleme maruz kişi"], a: 0 },
+        { q: "Bireysel tehditlerin 'öngörülemezlik' özelliği neyi ifade eder?", options: ["Kaynaklarının kısıtlı olmasını", "Teknik uzmanlıklarının az olmasını", "Birey oldukları için ne yapacaklarının tahmininin zor olmasını", "Kişisel nedenlerle saldırmalarını", "Şüpheli davranmalarını"], a: 2 },
+        { q: "I) Zorunludur<br>II) Yazılıdır<br>III) Önlemleri içerir<br>IV) Yetkili Otorite belirlenir<br>Yukarıdakilerden hangisi Ulusal Sivil Havacılık Güvenlik Programı için doğrudur?", options: ["II, III ve IV", "I, II ve III", "I, II, III ve IV", "Yalnız I", "II ve III"], a: 2 },
+        { q: "ICAO Ek-17 Güvenlik düzenlemesi için aşağıdakilerden hangisi doğrudur?", options: ["Çok detaylı ve kapsamlıdır", "Tüm sivil havacılık düzenlemelerini içerir", "Uygulama detaylarına dair ayrıntılı tavsiyeler içerir", "Oldukça kısa ve öz bir şekilde kaleme alınmıştır", "Tokyo Sözleşmesi’ne ek olarak düzenlenmiştir"], a: 3 },
+        { q: "Temel amacı halkın, personelin ve tesislerin korunması olan program hangisidir?", options: ["Ulusal Sivil Havacılık Güvenlik Programı", "Ulusal Sivil Havacılık Güvenlik Eğitim Programı", "Havayolu Emniyet Programı", "Havayolu Güvenlik Programı", "Ulusal Sivil Havacılık Emniyet Programı"], a: 0 },
+        { q: "Hangi sözleşme, sivil havacılığa karşı patlayıcı düzeneklerinin kullanılmasını (işaretlenmesi) kapsamaktadır?", options: ["Plastik Patlayıcıların İşaretlenmesine Dair Sözleşme (MEX)", "Tokyo Sözleşmesi", "Lahey Sözleşmesi", "Şikago Sözleşmesi", "Montreal Sözleşmesi"], a: 0 },
+        { q: "Hangi sözleşme, uçaktaki düzeni veya disiplini bozan eylemlerde hava aracından sorumlu kişilere yetki vermektedir?", options: ["Şikago Sözleşmesi", "Tokyo Sözleşmesi (Suçlar ve Diğer Bazı Eylemler)", "Lahey Sözleşmesi", "Montreal Sözleşmesi", "MEX Sözleşmesi"], a: 1 },
+        { q: "Aşağıdakilerden hangisi Ulusal Sivil Havacılık Güvenlik Komitesi’nin görevlerinden değildir?", options: ["Tavsiyelerde bulunmak", "Koordinasyonu sağlamak", "Tasarımda güvenliği teşvik etmek", "Uluslararası işbirliği yollarını düşünmek", "Havalimanlarında denetim, test ve inceleme yapmak"], a: 4 },
+        { q: "Şikago Sözleşmesi Ek-17’ye göre ulusal yapılanma en az hangilerini içermelidir?", options: ["Yetkili Otorite, Ulusal Komisyon, Yerel Otorite, Havaalanı Komisyonu", "Sadece Yetkili Otorite", "Yetkili Otorite ve Eğitim Birimi", "Sadece Havaalanı Komisyonu", "Yerel Otorite ve Eğitim Birimi"], a: 0 },
+        { q: "Ulusal yapılanmanın nasıl olması gerektiği nerede düzenlenmiştir?", options: ["Şikago Sözleşmesi Ek-17, Bölüm 3", "Şikago Sözleşmesi Ek-14, Bölüm 5", "Şikago Sözleşmesi Ek-15, Bölüm 7", "Şikago Sözleşmesi Ek-14, Bölüm 9", "Şikago Sözleşmesi Ek-15, Bölüm 8"], a: 0 },
+        { q: "USHGP'nin geliştirilmesi ve uygulanmasından sorumlu kuruluş hangisidir?", options: ["Ulusal Güvenlik Teşkilatı", "Yetkili Otorite", "Ulusal Havacılık Güvenliği Komitesi", "Ulusal Güvenlik Denetçisi", "Havaalanı Güvenlik Komisyonu"], a: 1 },
+        { q: "Havaalanı güvenlik komisyonu ile ilgili hangisi doğrudur?", options: ["Her havaalanı için ayrı kurulur, yerel düzeyde çalışır", "Sadece uluslararası havaalanlarında kurulur", "Sadece yolcu güvenliği ile sınırlıdır", "Havaalanı otoritesine bağlı çalışır", "Teknik bakımdan sorumludur"], a: 0 },
+        { q: "Araç giriş izinlerinde bulunması gerekenlerden hangisi doğrudur?", options: ["Araca özel olmalı, alanlar belirtilmeli, son tarih olmalı", "Sadece plaka yeterlidir", "Şoförün ismi yeterlidir", "Her araca verilebilir", "Süresiz olabilir"], a: 0 },
+        { q: "Geçerli bir giriş belgesi ve güvenlik kontrolü ile girilen yer neresidir?", options: ["Hava tarafı", "Kara tarafı", "Kontuar alanı", "Güvenlik tahditli alan", "Demarke alan"], a: 3 },
+        { q: "Giriş kartı sahibi personelin uyması gereken kural hangisidir?", options: ["Kartı sadece izin verilen alanlarda kullanmak", "Kartı başkasına vermek", "Taramayı reddetmek", "Misafir sokmak", "Kartı gizlemek"], a: 0 },
+        { q: "Sadece yolcu ve yetkili personelin girebildiği, giriş kontrolü yapılan noktadan sonraki kısım neresidir?", options: ["Güvenlik tahditli alan", "Kara tarafı", "Hava tarafı", "Check-in salonu", "Demarke alan"], a: 2 },
+        { q: "Hava tarafı ve GTA'ya yetkisiz girişin önlenmesi işlemine ne denir?", options: ["Güvenlik kontrolü", "Giriş kontrol", "Tarama", "Giriş kısıtlaması", "Yetkisiz giriş"], a: 1 },
+        { q: "Aşağıdakilerden hangisi etkili güvenlik kültürünün faydalarından DEĞİLDİR?", options: ["Çalışanlar sorumluluk alır", "Uyum seviyeleri artar", "Bildirme olasılığı yükselir", "Daha büyük güvenlik duygusu sağlanır", "Güvenliğin, büyük harcamalar yapılarak sağlanması"], a: 4 },
+        { q: "Güvenlik kültürünü geliştirmek için yapılan kampanyalardan hangisi doğrudur?", options: ["Sadece posterler", "Sadece videolar", "Sadece e-öğrenme", "El ilanları, e-öğrenme, intranet, dijital medya (Hepsi)", "Sadece toplantılar"], a: 3 },
+        { q: "Havacılık çalışanlarının güvenlik/tehditler hakkında bilinçsiz olması durumu nedir?", options: ["Temel sivil havacılık güvenliği", "Güvenli tedarik zinciri", "Güvenlik bilinci", "İlave güvenlik tedbiri", "Zayıf güvenlik kültürü"], a: 4 },
+        { q: "Hangisi etkili güvenlik kültürünün faydası DEĞİLDİR?", options: ["Güvenlik olaylarının yaşanma riskinin artması", "Çalışanların sorumluluk alması", "Şüpheli davranış bildiriminin artması", "Harcamasız gelişim", "Uyumun artması"], a: 0 },
+        { q: "Yöneticilerin sorumluluklarından olmayan hangisidir?", options: ["Geri bildirimi teşvik etmek", "Kurallara uymak ve örnek olmak", "Önlemleri teşvik etmek", "Ekonomik sıkıntıda güvenliği göz ardı etmek", "Güvenliği değer haline getirmek"], a: 3 }
     ];
 
-    let currentQuestions = [];
+    // 2. HAVUZ: AI (YAPAY ZEKA) SORU HAVUZU (PDF'ten türetilen yeni sorular)
+    const aiQuestions = [
+        { q: "Havacılık tarihindeki 'ilk uçak kaçırma' olayı hangi yılda ve nerede gerçekleşmiştir?", options: ["1930 Peru (Byron Rickards)", "1947 Romanya", "1948 Hong Kong", "1968 Atina", "1970 Filistin"], a: 0, badge: "Tarihçe" },
+        { q: "21 Aralık 1988'de Pan Am uçağının radyo içine gizlenmiş bombayla düşürüldüğü 'Lockerbie Faciası' hangi ülke tarafından desteklenmiştir?", options: ["İran", "Libya", "Suriye", "Kuzey Kore", "Irak"], a: 1, badge: "Olaylar" },
+        { q: "11 Eylül 2001 saldırılarını gerçekleştiren terör örgütü ve lideri kimdir?", options: ["IŞİD - Bağdadi", "Taliban - Molla Ömer", "El Kaide - Usame Bin Laden", "Boko Haram - Shekau", "Hizbullah - Nasrallah"], a: 2, badge: "Olaylar" },
+        { q: "1994 yılından günümüze kadar olan sivil havacılık tehdit dönemi nasıl adlandırılır?", options: ["İltica Dönemi", "Politik Terörizm Dönemi", "Soğuk Savaş Dönemi", "Kitle İmha Dönemi", "Siber Saldırı Dönemi"], a: 3, badge: "Tehditler" },
+        { q: "Kalan Risk (Residual Risk) formülü aşağıdakilerden hangisidir?", options: ["Risk x Zafiyet", "Tehdit x Önlem", "Risk x Risk Azaltıcı Tedbirler", "Zafiyet - Tehdit", "Risk + Tehdit"], a: 2, badge: "Kavramlar" },
+        { q: "'Uçakların Yasa Dışı Eylemlerle Ele Geçirilmesiyle Mücadele Konvansiyonu' olarak bilinen sözleşme hangisidir?", options: ["Tokyo Sözleşmesi (1963)", "Lahey Sözleşmesi (1970)", "Montreal Sözleşmesi (1971)", "Pekin Sözleşmesi (2010)", "Şikago Sözleşmesi (1944)"], a: 1, badge: "Mevzuat" },
+        { q: "ICAO tarafından hazırlanan, devletlere Ek-17 standartlarını uygulamada yardımcı olan ve 'gizli' statüsündeki rehber doküman hangisidir?", options: ["Doc 30", "Ek-14", "Doc 8973 (Güvenlik El Kitabı)", "Ek-9", "Doc 9859"], a: 2, badge: "Dokümanlar" },
+        { q: "Havaalanında herkesin giremediği, sadece biletli yolcu ve yetkili personelin girebildiği, güvenlik kontrolünden önceki veya sonraki operasyonel sahalara genel olarak ne ad verilir?", options: ["Kara Tarafı", "Hava Tarafı", "Otopark", "Check-in Alanı", "Halka Açık Alan"], a: 1, badge: "Alanlar" },
+        { q: "Aşağıdakilerden hangisi bir 'Tarama Yöntemi' (Screening Method) olarak tek başına yeterli kabul EDİLMEZ?", options: ["Kapı Tipi Metal Dedektör (KTMD)", "X-Ray Cihazı", "Patlayıcı İz Dedektörü (ETD)", "El Tipi Metal Dedektör (ETMD)", "Patlayıcı Tespit Köpekleri (K9)"], a: 3, badge: "Cihazlar" },
+        { q: "Şüpheli bir paket tespit edildiğinde yapılması gereken İLK şeylerden biri nedir?", options: ["Paketi açıp kontrol etmek", "Paketin üzerini örtmek", "Paketin üzerine su dökmek", "Çevresinde emniyet hattı oluşturup, dokunmamak", "Paketi alıp dışarı atmak"], a: 3, badge: "Acil Durum" },
+        { q: "Etkili bir olay raporlamasında mutlaka bulunması gereken '5N 1K' bilgileri nelerdir?", options: ["Ne, Nerede, Ne Zaman, Nasıl, Neden, Kim", "İsim, Soyisim, Adres, Telefon, İmza, Tarih", "Olay, Saat, Yer, Tanık, Fail, Polis", "Giriş, Gelişme, Sonuç, Özet, Yorum, İmza", "Kimlik, Kart No, Plaka, Marka, Model, Renk"], a: 0, badge: "Raporlama" },
+        { q: "Çalışanların hatalarını veya güvenlik ihlallerini korkmadan rapor edebildiği, ancak kasıtlı suçların cezalandırıldığı kültüre ne ad verilir?", options: ["Cezalandırıcı Kültür", "Adil Kültür (Just Culture)", "Sessizlik Kültürü", "Otoriter Kültür", "Serbest Kültür"], a: 1, badge: "Kültür" },
+        { q: "Sivil Havacılık güvenliğinde 'İç Tehdit' (Insider Threat) ne anlama gelir?", options: ["Yolcuların kendi aralarında kavga etmesi", "Havalimanı dışında gerçekleşen saldırılar", "Havacılık çalışanının yetkilerini kötüye kullanarak tehdit oluşturması", "Uçak içindeki teknik arızalar", "Havalimanı içindeki trafik kazaları"], a: 2, badge: "Tehditler" },
+        { q: "ECAC (Avrupa Sivil Havacılık Konferansı) güvenlik politikalarını içeren doküman hangisidir?", options: ["Ek-17", "Doc 8973", "Doc 30 Kısım II", "TSA Yönetmeliği", "AB Anayasası"], a: 2, badge: "Mevzuat" },
+        { q: "Sivil havacılığa karşı işlenen suçlarda 'yetki' konusunu (uçağın tescil edildiği devletin yetkisi) düzenleyen ilk sözleşme hangisidir?", options: ["Tokyo Sözleşmesi (1963)", "Lahey Sözleşmesi (1970)", "Pekin Sözleşmesi (2010)", "MEX Sözleşmesi (1991)", "Şikago Sözleşmesi (1944)"], a: 0, badge: "Mevzuat" },
+        { q: "Risk değerlendirmesi formülünde 'Tehdit' ile 'Zafiyet'in çarpımı neyi verir?", options: ["Güvenlik", "Emniyet", "Risk", "Olasılık", "Maliyet"], a: 2, badge: "Kavramlar" },
+        { q: "Havaalanlarında 'Kara Tarafı' (Landside) olarak adlandırılan bölge neresidir?", options: ["Pistler ve taksi yolları", "Uçak park alanları", "Güvenlik kontrolünden sonraki arındırılmış salonlar", "Halka açık olan, bilet/kontrol gerektirmeyen alanlar (Otopark, Check-in)", "Bagaj ayırma sahası"], a: 3, badge: "Alanlar" },
+        { q: "11 Eylül saldırılarında teröristlerin uçakları kaçırmak için kullandıkları (o dönem yasak olmayan) kesici alet neydi?", options: ["Kılıç", "Silah", "Maket Bıçağı (Falçata)", "Bombalı yelek", "Zehirli gaz"], a: 2, badge: "Olaylar" },
+        { q: "Plastik patlayıcıların dedektörler tarafından tespit edilebilmesi için üretim aşamasında içine kimyasal ajan eklenmesini zorunlu kılan sözleşme hangisidir?", options: ["Tokyo Sözleşmesi", "MEX (Marking of Explosives) Sözleşmesi", "Lahey Sözleşmesi", "Roma Sözleşmesi", "Viyana Sözleşmesi"], a: 1, badge: "Mevzuat" },
+        { q: "Havacılık güvenliğinde 'Güvenlik Kültürü'nün beş temel bileşeni nedir?", options: ["Para, Zaman, Mekan, İnsan, Teknoloji", "Normlar, İnançlar, Değerler, Tutumlar, Varsayımlar", "Polis, Asker, Güvenlik, Pilot, Hostes", "X-Ray, Kapı Dedektörü, Kamera, Çit, Bariyer", "Yasa, Yönetmelik, Tüzük, Genelge, Talimat"], a: 1, badge: "Kültür" },
+        { q: "Şüpheli bir durumda '5N 1K' kuralına göre 'Nasıl Fark Edildi?' sorusu neyi açıklar?", options: ["Olayın ihbarla mı yoksa devriye sırasında mı bulunduğunu", "Olayın saatini", "Olayın yerini", "Olayın failini", "Olayın nedenini"], a: 0, badge: "Raporlama" },
+        { q: "'Zayıf Güvenlik Kültürü'nün bir göstergesi olan 'Bunun bir yolu olmalı' (workaround) yaklaşımı neyi ifade eder?", options: ["Sorunlara yaratıcı çözümler bulmayı", "Güvenlik prosedürlerini atlayarak işi çabuk yapmaya çalışmayı", "Güvenlik kurallarına sıkı sıkıya uymayı", "Yeni teknolojiler geliştirmeyi", "Yöneticilere rapor vermeyi"], a: 1, badge: "Kültür" },
+        { q: "2016 yılında IŞİD tarafından gerçekleştirilen ve hem dış hatlar hem de otopark bölgesini hedef alan saldırı hangi havalimanında olmuştur?", options: ["Brüksel Havalimanı", "Domodedovo Havalimanı", "Atatürk Havalimanı", "Londra Heathrow", "New York JFK"], a: 2, badge: "Olaylar" },
+        { q: "Hava aracının yasadışı olarak ele geçirilmesi dışında; biyolojik, kimyasal ve nükleer saldırıları da suç kapsamına alan 2010 tarihli sözleşme hangisidir?", options: ["Pekin Sözleşmesi", "Tokyo Sözleşmesi", "Lahey Sözleşmesi", "Montreal Sözleşmesi", "Paris Sözleşmesi"], a: 0, badge: "Mevzuat" },
+        { q: "Güvenlik Tahditli Alanlara (GTA) giriş yapacak kişilerin ve eşyaların taranma oranı ne olmalıdır?", options: ["%10", "%50", "%75", "%90", "%100"], a: 4, badge: "Önlemler" },
+        { q: "Bir havalimanında 'Hava Tarafı' ile 'Güvenlik Tahditli Alan' arasındaki temel fark nedir?", options: ["Fark yoktur, aynıdır.", "Hava tarafı halka açıktır.", "GTA, hava tarafının içinde yer alan, daha yüksek güvenlik ve geçerli kart gerektiren hassas bölgedir.", "Hava tarafında uçak yoktur.", "GTA'da pasaport kontrolü yapılır."], a: 2, badge: "Alanlar" },
+        { q: "Uluslararası Sivil Havacılık Teşkilatı'nın (ICAO) merkezi hangi şehirdedir?", options: ["New York", "Cenevre", "Londra", "Paris", "Montreal"], a: 4, badge: "Organizasyon" },
+        { q: "Aşağıdakilerden hangisi bir 'Bireysel Tehdit' motivasyonu olabilir?", options: ["Küresel cihat", "Hükümeti devirmek", "Akli dengesizlik veya kişisel intikam", "Organize suç örgütü kurmak", "Ülkeyi işgal etmek"], a: 2, badge: "Tehditler" },
+        { q: "Güvenlik kültürünü geliştirmek için yöneticilerin yapması gereken en önemli davranış nedir?", options: ["Kuralları ihlal etmek", "Personele sürekli ceza vermek", "Güvenliği ekonomik bir yük olarak görmek", "Söyledikleriyle yaptıkları tutarlı olup örnek teşkil etmek (Role Model)", "Odalarından çıkmamak"], a: 3, badge: "Liderlik" },
+        { q: "Sivil havacılığa yönelik saldırıların 'Politik Terörizm' dönemi (uçak kaçırıp pazarlık yapma) hangi yıllar arasını kapsar?", options: ["1930-1945", "1948-1968", "1968-1994", "1994-Günümüz", "2001-Günümüz"], a: 2, badge: "Tarihçe" },
+        { q: "Patlayıcı İz Tespit Cihazı (ETD) ne işe yarar?", options: ["Metali tespit eder", "Sıvıları analiz eder", "X-ray görüntüsü verir", "Patlayıcı partikül ve buharlarını analiz eder", "Vücut ısısını ölçer"], a: 3, badge: "Cihazlar" },
+        { q: "Havaalanı Güvenlik Programının oluşturulması kime aittir ve neye uygun olmalıdır?", options: ["Havaalanı işletmecisine aittir, Ulusal Programa (USHGP) uygun olmalıdır.", "Polise aittir, Ceza kanununa uygun olmalıdır.", "Havayoluna aittir, IATA kurallarına uygun olmalıdır.", "Belediyeye aittir, İmar kanununa uygun olmalıdır.", "Güvenlik şirketine aittir, İş kanununa uygun olmalıdır."], a: 0, badge: "Organizasyon" },
+        { q: "Aşağıdakilerden hangisi 'Kuraldışı Yolcu' tanımına girer?", options: ["Uçağa geç kalan yolcu", "Bileti olmayan yolcu", "Personelin talimatlarına uymayan, saldırganlaşan veya uçuş güvenliğini tehlikeye atan yolcu", "Hasta yolcu", "Bagajı kaybolan yolcu"], a: 2, badge: "Tanımlar" },
+        { q: "Şikago Sözleşmesi'nin güvenlikle ilgili olan 'Eki' (Annex) hangisidir?", options: ["Ek-9 (Kolaylıklar)", "Ek-14 (Havaalanları)", "Ek-17 (Güvenlik)", "Ek-18 (Tehlikeli Maddeler)", "Ek-6 (Operasyon)"], a: 2, badge: "Mevzuat" },
+        { q: "Bir havalimanında sahipsiz bir bagaj bulunduğunda hangisi YAPILMAZ?", options: ["Güvenlik birimine haber verilir", "Çevre emniyeti alınır", "İnsanlar uzaklaştırılır", "Çantanın kime ait olduğunu anlamak için fermuarı açılır", "Bomba imha uzmanı beklenir"], a: 3, badge: "Acil Durum" },
+        { q: "Güvenlik kültüründe 'Normlar' neyi ifade eder?", options: ["Yazılı olmayan kuralları ve beklenen davranış kalıplarını", "Resmi kanunları", "Teknik cihazları", "Havalimanı mimarisini", "Uçak tiplerini"], a: 0, badge: "Kültür" },
+        { q: "1948 yılında gerçekleşen ilk Asya uçak kaçırma olayı hangi havayoluna aittir?", options: ["Singapore Airlines", "Cathay Pacific (Miss Macao)", "Japan Airlines", "Thai Airways", "Air India"], a: 1, badge: "Tarihçe" },
+        { q: "Havaalanı giriş kartını kaybeden bir personel ne yapmalıdır?", options: ["Yenisini alana kadar arkadaşının kartını kullanmalıdır", "Durumu derhal kurumuna ve güvenlik makamlarına bildirmelidir", "Kimseye söylemeden çalışmaya devam etmelidir", "Eve gidip dinlenmelidir", "Kayıp ilanı vermelidir"], a: 1, badge: "Prosedür" },
+        { q: "Güvenlik kontrol noktalarında kişilerin üzerinde metal nesne olup olmadığını tespit eden birincil cihaz hangisidir?", options: ["X-Ray", "Kapı Tipi Metal Dedektör (KTMD)", "El Tipi Dedektör", "Patlayıcı Dedektörü", "Kamera"], a: 1, badge: "Cihazlar" },
+        { q: "Aşağıdakilerden hangisi ICAO'nun amaçlarından biridir?", options: ["Sivil havacılığın emniyetli ve düzenli gelişimini sağlamak", "Sadece askeri uçuşları düzenlemek", "Uçak bileti fiyatlarını belirlemek", "Turizm acentelerini denetlemek", "Pasaport basmak"], a: 0, badge: "Organizasyon" }
+    ];
+
+    // Değişkenler
+    let currentPool = [];
     let currentQuestionIndex = 0;
     let userAnswers = [];
-    let score = 0;
-
+    let isQuizActive = false;
+    
     // DOM Elementleri
+    const introScreen = document.getElementById("intro-screen");
+    const quizContainer = document.getElementById("quiz-container");
     const qNumEl = document.getElementById("current-q-num");
     const totalQNumEl = document.getElementById("total-q-num");
     const qTextEl = document.getElementById("question-text");
@@ -598,44 +474,68 @@
     const prevBtn = document.getElementById("btn-prev");
     const nextBtn = document.getElementById("btn-next");
     const gridContainer = document.getElementById("pagination-grid");
-    const quizScreen = document.getElementById("quiz-screen");
     const resultScreen = document.getElementById("result-screen");
+    const quizContent = document.getElementById("quiz-content");
     const finalScoreEl = document.getElementById("final-score");
     const resultMsgEl = document.getElementById("result-message");
     const statsTextEl = document.getElementById("stats-text");
     const autoAdvanceToggle = document.getElementById("auto-advance");
+    const poolBadgeEl = document.getElementById("pool-badge");
 
-    function initQuiz() {
-        // Soruları karıştırmak isterseniz alttaki satırı açabilirsiniz
-        // currentQuestions = [...questionsData].sort(() => Math.random() - 0.5); 
-        currentQuestions = [...questionsData];
-        
-        userAnswers = new Array(currentQuestions.length).fill(null);
+    // Test Başlatma
+    function startQuiz(mode) {
+        let pool = [];
+        let badgeText = "";
+
+        if (mode === 'chapter') {
+            pool = [...chapterQuestions];
+            badgeText = "Bölüm Sonu Soruları";
+        } else if (mode === 'ai') {
+            pool = [...aiQuestions];
+            badgeText = "AI Soru Havuzu";
+        } else if (mode === 'mixed') {
+            pool = [...chapterQuestions, ...aiQuestions];
+            // Karıştır
+            pool.sort(() => Math.random() - 0.5);
+            badgeText = "Karışık Mod";
+        }
+
+        currentPool = pool;
         currentQuestionIndex = 0;
-        score = 0;
-
-        totalQNumEl.textContent = currentQuestions.length;
+        userAnswers = new Array(pool.length).fill(null);
+        poolBadgeEl.textContent = badgeText;
         
-        quizScreen.style.display = "block";
+        // UI Geçişi
+        introScreen.style.display = "none";
+        quizContainer.style.display = "block";
+        quizContent.style.display = "block";
         resultScreen.style.display = "none";
-
+        
+        totalQNumEl.textContent = currentPool.length;
+        
         createPaginationGrid();
         loadQuestion(0);
     }
 
+    // Soruyu Yükle
     function loadQuestion(index) {
-        if (index < 0 || index >= currentQuestions.length) return;
+        if (index < 0 || index >= currentPool.length) return;
         currentQuestionIndex = index;
 
-        const q = currentQuestions[index];
+        const q = currentPool[index];
         qNumEl.textContent = index + 1;
         qTextEl.innerHTML = q.q;
+        
+        // Badge güncelle (AI havuzunda özel badge varsa)
+        if (q.badge) {
+            poolBadgeEl.textContent = q.badge;
+        }
 
         optionsContainer.innerHTML = "";
         q.options.forEach((opt, i) => {
             const li = document.createElement("li");
             li.className = "option-item";
-            li.innerHTML = opt; // HTML etiketlerini (örn: <br>) işleyebilmesi için innerHTML
+            li.innerHTML = opt;
             
             const savedAnswer = userAnswers[index];
             if (savedAnswer !== null) {
@@ -656,10 +556,11 @@
         updatePaginationGrid();
     }
 
+    // Seçenek İşaretleme
     function selectOption(selectedIndex, element) {
         if (userAnswers[currentQuestionIndex] !== null) return;
 
-        const correctIndex = currentQuestions[currentQuestionIndex].a;
+        const correctIndex = currentPool[currentQuestionIndex].a;
         userAnswers[currentQuestionIndex] = selectedIndex;
 
         const options = optionsContainer.children;
@@ -668,7 +569,7 @@
             element.classList.add("correct");
             if (autoAdvanceToggle.checked) {
                 setTimeout(() => {
-                    if (currentQuestionIndex < currentQuestions.length - 1) {
+                    if (currentQuestionIndex < currentPool.length - 1) {
                         nextQuestion();
                     }
                 }, 700);
@@ -681,8 +582,9 @@
         updatePaginationGrid();
     }
 
+    // Navigasyon
     function nextQuestion() {
-        if (currentQuestionIndex < currentQuestions.length - 1) {
+        if (currentQuestionIndex < currentPool.length - 1) {
             loadQuestion(currentQuestionIndex + 1);
         } else {
             finishQuiz();
@@ -697,7 +599,7 @@
 
     function updateButtons() {
         prevBtn.disabled = currentQuestionIndex === 0;
-        if (currentQuestionIndex === currentQuestions.length - 1) {
+        if (currentQuestionIndex === currentPool.length - 1) {
             nextBtn.textContent = "Testi Bitir";
         } else {
             nextBtn.textContent = "Sonraki Soru →";
@@ -706,7 +608,7 @@
 
     function createPaginationGrid() {
         gridContainer.innerHTML = "";
-        currentQuestions.forEach((_, i) => {
+        currentPool.forEach((_, i) => {
             const dot = document.createElement("div");
             dot.className = "page-dot";
             dot.textContent = i + 1;
@@ -726,7 +628,7 @@
 
             const answer = userAnswers[i];
             if (answer !== null) {
-                const isCorrect = answer === currentQuestions[i].a;
+                const isCorrect = answer === currentPool[i].a;
                 if (isCorrect) {
                     dots[i].classList.add("correct-mark");
                 } else {
@@ -736,15 +638,16 @@
         }
     }
 
+    // Test Bitirme
     function finishQuiz() {
         let correctCount = 0;
         userAnswers.forEach((ans, i) => {
-            if (ans === currentQuestions[i].a) correctCount++;
+            if (ans === currentPool[i].a) correctCount++;
         });
 
-        const percentage = Math.round((correctCount / currentQuestions.length) * 100);
+        const percentage = Math.round((correctCount / currentPool.length) * 100);
         
-        quizScreen.style.display = "none";
+        quizContent.style.display = "none";
         resultScreen.style.display = "block";
         
         finalScoreEl.textContent = `%${percentage}`;
@@ -759,20 +662,15 @@
             finalScoreEl.parentElement.style.backgroundColor = "var(--error-color)";
         }
 
-        statsTextEl.textContent = `Toplam ${currentQuestions.length} sorudan ${correctCount} tanesini doğru bildiniz.`;
+        statsTextEl.textContent = `Toplam ${currentPool.length} sorudan ${correctCount} tanesini doğru bildiniz.`;
     }
 
-    function restartQuiz() {
-        initQuiz();
-    }
-
-    // Başlat
-    initQuiz();
-
-    // Klavye Yön Tuşları
+    // Klavye Desteği
     document.addEventListener('keydown', (e) => {
-        if (e.key === "ArrowRight") nextQuestion();
-        if (e.key === "ArrowLeft") prevQuestion();
+        if (document.getElementById("quiz-container").style.display === "block") {
+            if (e.key === "ArrowRight") nextQuestion();
+            if (e.key === "ArrowLeft") prevQuestion();
+        }
     });
 
 </script>
