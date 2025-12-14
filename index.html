@@ -477,7 +477,6 @@
     let currentPool = [];
     let currentQuestionIndex = 0;
     let userAnswers = [];
-    let isQuizActive = false;
     let wrongAnswersPool = []; // Yanlış cevaplanan soruları tutmak için
     
     // DOM Elementleri
@@ -683,7 +682,8 @@
                 correctCount++;
             } else {
                 // Yanlış cevaplanan soruyu havuza ekle
-                wrongAnswersPool.push(currentPool[i]);
+                // Object.assign veya spread operator ile kopyalıyoruz
+                wrongAnswersPool.push({...currentPool[i]});
             }
         });
 
